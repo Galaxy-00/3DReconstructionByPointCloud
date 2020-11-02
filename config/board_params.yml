@@ -1,0 +1,7 @@
+w: 5
+h: 7
+d: 10
+sl: 34 # 单位: ｍｍ
+ml: 20
+cameraParamsFile: "camera_params.yml"
+detectorParamsFile: "detector_params.yml"
