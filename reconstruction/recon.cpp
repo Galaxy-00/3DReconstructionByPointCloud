@@ -13,22 +13,30 @@ Reconstruction::Reconstruction(Mat &camMatrix, Mat &distCoeffs, int *x, int *y, 
     }
 }
 
-void Reconstruction::reprojectPoints(Mat &frame, Mat &t_R, Mat &t_t)
+void Reconstruction::drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t)
 {
+    // 利用t_R和t_t 重投影, 画出三维坐标轴
     std::vector<cv::Point3f> ori_pnt;
-    ori_pnt.push_back(cv::Point3f(0, 0, 0));
-    ori_pnt.push_back(cv::Point3f(0, 100, 0));
-    ori_pnt.push_back(cv::Point3f(100, 0, 0));
-    ori_pnt.push_back(cv::Point3f(0, 0, 100));
+    ori_pnt.push_back(cv::Point3f(0, 0, 0)); // 坐标原点
+    ori_pnt.push_back(cv::Point3f(0, 20, 0));
+    ori_pnt.push_back(cv::Point3f(20, 0, 0));
+    ori_pnt.push_back(cv::Point3f(0, 0, 20));
+    // 将ori_pnt 投影到二维平面图像上
     cv::projectPoints(ori_pnt, t_R, t_t, camMatrix, distCoeffs, reproj_point);
 
     cv::circle(frame, reproj_point[0], 5, cv::Scalar(0, 255, 255), 3);
     cv::circle(frame, reproj_point[1], 5, cv::Scalar(0, 0, 0), 3);
     cv::circle(frame, reproj_point[2], 5, cv::Scalar(0, 255, 0), 3);
     cv::circle(frame, reproj_point[3], 5, cv::Scalar(255, 255, 0), 3);
-    cv::line(frame, reproj_point[0], reproj_point[1], cv::Scalar(0, 255, 0), 3);
-    cv::line(frame, reproj_point[0], reproj_point[2], cv::Scalar(0, 0, 255), 3);
-    cv::line(frame, reproj_point[0], reproj_point[3], cv::Scalar(255, 0, 0), 3);
+    cv::line(frame, reproj_point[0], reproj_point[1], cv::Scalar(0, 255, 0), 3); // y轴, 绿色
+    cv::line(frame, reproj_point[0], reproj_point[2], cv::Scalar(0, 0, 255), 3); // x轴, 红色
+    cv::line(frame, reproj_point[0], reproj_point[3], cv::Scalar(255, 0, 0), 3); // z轴, 蓝色
+}
+
+void Reconstruction::drawAxis(Mat &frame, Mat &t_R, Mat &t_t)
+{
+    float axisLength = 3 * 0.34;
+    aruco::drawAxis(frame, camMatrix, distCoeffs, t_R, t_t, axisLength);
 }
 
 void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_t, vector<cv::Vec3f> &object_cloud, vector<cv::Vec3b> &object_color)

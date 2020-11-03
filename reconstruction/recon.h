@@ -9,8 +9,9 @@ class Reconstruction
 public:
     Reconstruction(Mat &camMatrix, Mat &distCoeffe, int *x, int *y, int *z);
     void CreatPointCloud(std::vector<cv::Vec3f> &cloud, std::vector<cv::Vec3b> &color, int *x, int *y, int *z);
-    void reprojectPoints(Mat &frame, Mat &t_R, Mat &t_t);
+    void drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t);
     void setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_t, vector<cv::Vec3f> &objectPoints, vector<Vec3b> &objectColor);
+    void drawAxis(Mat &frame, Mat &t_R, Mat &t_t);
 
 public:
     Mat camMatrix;

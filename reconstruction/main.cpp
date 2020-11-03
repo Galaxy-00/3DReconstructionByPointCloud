@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     CommandLineParser parser(argc, argv, keys);
     parser.about(about);
 
-    if (argc <= 7)
+    if (argc < 8)
     {
         parser.printMessage();
         return 0;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     Segmentation segmenters(0, 255, Segmentation::H, 1);
 
     // 目标物体在距离世界坐标原点的范围
-    int x[] = {-200, 0}; 
+    int x[] = {-200, 0};
     int y[] = {0, 200};
     int z[] = {0, 100};
     Reconstruction recon(pnp_solver.camMatrix, pnp_solver.distCoeffs, x, y, z);
@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
     // 3D可视化显示
     viz::Viz3d window("window");
     viz::WCoordinateSystem world_coor(40.0);
-    viz::WPlane plane(cv::Size(200, 200));
-    viz::WCloud *cloud_widget = NULL;
+    viz::WPlane plane(cv::Size(400, 400));
+    viz::WCloud *cloud_widget = nullptr;
     window.showWidget("World", world_coor);
     window.showWidget("plane", plane);
 
@@ -69,13 +69,14 @@ int main(int argc, char *argv[])
         Mat frame_copy = frame.clone();
 
         // Solve Pnp Part
-        bool t_pnp_valid = pnp_solver.solve(frame, t_R, t_t);
+        bool t_pnp_valid = pnp_solver.solve(frame, t_R, t_t); // 得到相机当前位姿t_R, t_t
         if (!t_pnp_valid)
         {
-            cout << "not vaild" << endl;
+            cout << "image not vaild, put the charuco board inside the camera sight" << endl;
             continue;
         }
-        recon.reprojectPoints(frame, t_R, t_t); // 得到相机当前位姿t_R, t_t
+        recon.drawAxisByProject(frame, t_R, t_t); // 通过重投影的点画出世界坐标系下的三维坐标轴, x R, y G, z B
+        // recon.drawAxis(frame, t_R, t_t); // 根据相机当前t_R, t_t 画出世界坐标系下的三维坐标轴
         cv::imshow("image", frame);
 
         // Segment Part
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
             std::vector<cv::Vec3b> object_color;
             recon.setPointCloud(frame, frame_out, t_R, t_t, object_cloud, object_color);
 
-            if (cloud_widget == NULL)
+            if (cloud_widget == nullptr)
             {
                 cloud_widget = new viz::WCloud(object_cloud, object_color);
             }
@@ -106,7 +107,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (cloud_widget != NULL)
+        if (cloud_widget != nullptr)
         {
             window.showWidget("point_cloud", *cloud_widget);
         }
