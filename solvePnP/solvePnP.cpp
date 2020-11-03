@@ -1,17 +1,19 @@
 #include "solvePnP.h"
 
-SolvePnP_::SolvePnP_(int w, int h, int d, int sl, int ml, string cameraParamsFile, string detectorParamsFile) : w(w),
-                                                                                                                h(h),
-                                                                                                                d(d),
-                                                                                                                sl(sl),
-                                                                                                                ml(ml)
+SolvePnP_::SolvePnP_(int w, int h, int d, float sl, float ml, string cameraParamsFile, string detectorParamsFile) : w(w),
+                                                                                                                    h(h),
+                                                                                                                    d(d),
+                                                                                                                    sl(sl),
+                                                                                                                    ml(ml)
 {
-    if (!readCameraParams(cameraParamsFile, this->camMatrix, this->distCoeffs))
+    if (!readCameraParams(cameraParamsFile, camMatrix, distCoeffs))
     {
         cerr << "Invalid camera parameters file" << endl;
         return;
     }
-    if (!readDetectorParameters(detectorParamsFile, this->detectorParams))
+
+    detectorParamters = aruco::DetectorParameters::create();
+    if (!readDetectorParameters(detectorParamsFile, detectorParamters))
     {
         cerr << "Invalid detector parameters file" << endl;
         return;
@@ -47,7 +49,7 @@ bool SolvePnP_::detectorCharuco(Mat &inImage, vector<Point2f> &charucoCorners, v
     vector<int> markerIds;
     vector<vector<Point2f>> markerCorners, rejectedMarkers;
 
-    aruco::detectMarkers(inImage, dictionary, markerCorners, markerIds, detectorParams, rejectedMarkers);
+    aruco::detectMarkers(inImage, dictionary, markerCorners, markerIds, detectorParamters, rejectedMarkers);
 
     aruco::refineDetectedMarkers(inImage, board, markerCorners, markerIds, rejectedMarkers,
                                  camMatrix, distCoeffs);
@@ -68,11 +70,11 @@ void SolvePnP_::getObjectAndImagePoints(vector<int> &charucoIds, vector<Point2f>
     for (int i = 0; i < charucoIds.size(); i++)
     {
         int cId = charucoIds.at(i);
-        int cX = cId % 4;
-        int xY = cId / 4;
+        int cX = cId % (w - 1);
+        int cY = cId / (w - 1);
         cv::Point3f cPoint(
             cX * sl,
-            xY * sl,
+            cY * sl,
             0);
         objectPoints.push_back(cPoint);
     }
@@ -88,6 +90,7 @@ bool SolvePnP_::readDetectorParameters(string filename, Ptr<aruco::DetectorParam
     FileStorage fs(filename, FileStorage::READ);
     if (!fs.isOpened())
         return false;
+
     fs["adaptiveThreshWinSizeMin"] >> params->adaptiveThreshWinSizeMin;
     fs["adaptiveThreshWinSizeMax"] >> params->adaptiveThreshWinSizeMax;
     fs["adaptiveThreshWinSizeStep"] >> params->adaptiveThreshWinSizeStep;

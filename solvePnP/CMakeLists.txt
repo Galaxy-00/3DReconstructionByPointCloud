@@ -10,8 +10,8 @@ file(GLOB solve_pnp_src solvePnP.cpp)
 add_library(solve_pnp_shared SHARED ${solve_pnp_src})
 add_library(solve_pnp_static STATIC ${solve_pnp_src})
 
-set_target_properties(solve_pnp_shared PROPERTIES OUTPUT_NAME "SolvePnP")
-set_target_properties(solve_pnp_static PROPERTIES OUTPUT_NAME "SolvePnP")
+set_target_properties(solve_pnp_shared PROPERTIES OUTPUT_NAME "solvePnP")
+set_target_properties(solve_pnp_static PROPERTIES OUTPUT_NAME "solvePnP")
 
 # install 
 INSTALL(TARGETS solve_pnp_shared solve_pnp_static
