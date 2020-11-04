@@ -1,4 +1,5 @@
 #include "recon.h"
+#include "boost/format.hpp"
 
 namespace
 {
@@ -6,8 +7,8 @@ namespace
     const char *keys =
         "{w        |       | Number of squares in X direction }"
         "{h        |       | Number of squares in Y direction }"
-        "{sl       |       | Square side length (in meters) }"
-        "{ml       |       | Marker side length (in meters) }"
+        "{sl       |       | Square side length (in meters, mm) }"
+        "{ml       |       | Marker side length (in meters, mm) }"
         "{d        |       | dictionary: DICT_4X4_50=0, DICT_4X4_100=1, DICT_4X4_250=2,"
         "DICT_4X4_1000=3, DICT_5X5_50=4, DICT_5X5_100=5, DICT_5X5_250=6, DICT_5X5_1000=7, "
         "DICT_6X6_50=8, DICT_6X6_100=9, DICT_6X6_250=10, DICT_6X6_1000=11, DICT_7X7_50=12,"
@@ -61,6 +62,8 @@ int main(int argc, char *argv[])
     window.showWidget("World", world_coor);
     window.showWidget("plane", plane);
 
+    int count = 0;
+    boost::format fmt("img%d.png");
     Mat t_R, t_t, frame;
     cv::VideoCapture cp(camId);
     while (cp.grab())
@@ -105,6 +108,10 @@ int main(int argc, char *argv[])
                 delete cloud_widget;
                 cloud_widget = new viz::WCloud(object_cloud, object_color);
             }
+        }
+        else if (key == 's')
+        {
+            window.saveScreenshot((fmt % count++).str());
         }
 
         if (cloud_widget != nullptr)

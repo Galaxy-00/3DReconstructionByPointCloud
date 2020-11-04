@@ -18,9 +18,9 @@ void Reconstruction::drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t)
     // 利用t_R和t_t 重投影, 画出三维坐标轴
     std::vector<cv::Point3f> ori_pnt;
     ori_pnt.push_back(cv::Point3f(0, 0, 0)); // 坐标原点
-    ori_pnt.push_back(cv::Point3f(0, 20, 0));
-    ori_pnt.push_back(cv::Point3f(20, 0, 0));
-    ori_pnt.push_back(cv::Point3f(0, 0, 20));
+    ori_pnt.push_back(cv::Point3f(0, 60, 0));
+    ori_pnt.push_back(cv::Point3f(60, 0, 0));
+    ori_pnt.push_back(cv::Point3f(0, 0, 60));
     // 将ori_pnt 投影到二维平面图像上
     cv::projectPoints(ori_pnt, t_R, t_t, camMatrix, distCoeffs, reproj_point);
 
