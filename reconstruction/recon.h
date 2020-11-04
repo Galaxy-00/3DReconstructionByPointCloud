@@ -1,8 +1,11 @@
 #ifndef RECON_H
 #define RECON_H
 
-#include "../segmentation/segmentation.h"
-#include "../solvePnP/solvePnP.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/aruco/charuco.hpp>
+
+using namespace std;
+using namespace cv;
 
 class Reconstruction
 {
@@ -14,12 +17,11 @@ public:
     void drawAxis(Mat &frame, Mat &t_R, Mat &t_t);
 
 public:
-    Mat camMatrix;
-    Mat distCoeffs;
-    std::vector<cv::Vec3f> cloud; // 存储x,y,z位置
+    Mat camMatrix; // 相机内参
+    Mat distCoeffs; // 相机畸变
+    std::vector<cv::Vec3f> cloud; // 点云, 用于筛选出属于目标的点
     std::vector<cv::Vec3b> color; // 存储BGR颜色
-    std::vector<bool> cloud_point_valid;
-    std::vector<cv::Point2f> reproj_point;
+    std::vector<bool> cloud_point_valid; // 存储改点是否有效
 };
 
 #endif // RECON_H

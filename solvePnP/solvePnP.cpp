@@ -44,18 +44,21 @@ bool SolvePnP_::solve(Mat &image, Mat &rvec, Mat &tvec)
     return false;
 }
 
+// 识别charuco获取角点及其id
 bool SolvePnP_::detectorCharuco(Mat &inImage, vector<Point2f> &charucoCorners, vector<int> &charucoIds)
 {
     vector<int> markerIds;
     vector<vector<Point2f>> markerCorners, rejectedMarkers;
 
+    // 识别角点获取像素位置以及对应id
     aruco::detectMarkers(inImage, dictionary, markerCorners, markerIds, detectorParamters, rejectedMarkers);
-
+    // 再识别
     aruco::refineDetectedMarkers(inImage, board, markerCorners, markerIds, rejectedMarkers,
                                  camMatrix, distCoeffs);
     int interpolatedCorners = 0;
     if (markerIds.size() > 0)
     {
+        // 通过插值获取相机内参和畸变
         interpolatedCorners =
             aruco::interpolateCornersCharuco(markerCorners, markerIds, inImage, charucoboard,
                                              charucoCorners, charucoIds, camMatrix, distCoeffs);

@@ -1,9 +1,11 @@
+#include "../segmentation/segmentation.h"
+#include "../solvePnP/solvePnP.h"
 #include "recon.h"
 #include "boost/format.hpp"
 
 namespace
 {
-    const char *about = "Pose estimation using a ChArUco board";
+    const char *about = "Reconstruction";
     const char *keys =
         "{w        |       | Number of squares in X direction }"
         "{h        |       | Number of squares in Y direction }"
@@ -73,13 +75,11 @@ int main(int argc, char *argv[])
 
         // Solve Pnp Part
         bool t_pnp_valid = pnp_solver.solve(frame, t_R, t_t); // 得到相机当前位姿t_R, t_t
-        if (!t_pnp_valid)
+        if (t_pnp_valid)
         {
-            cout << "image not vaild, put the charuco board inside the camera sight" << endl;
-            continue;
+            recon.drawAxisByProject(frame, t_R, t_t); // 通过重投影的点画出世界坐标系下的三维坐标轴, x R, y G, z B
+            // recon.drawAxis(frame, t_R, t_t); // 根据相机当前t_R, t_t 画出世界坐标系下的三维坐标轴
         }
-        recon.drawAxisByProject(frame, t_R, t_t); // 通过重投影的点画出世界坐标系下的三维坐标轴, x R, y G, z B
-        // recon.drawAxis(frame, t_R, t_t); // 根据相机当前t_R, t_t 画出世界坐标系下的三维坐标轴
         cv::imshow("image", frame);
 
         // Segment Part
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
         {
             break;
         }
-        else if (key == 'c')
+        else if (key == 'c' && t_pnp_valid)
         {
             std::vector<cv::Vec3f> object_cloud;
             std::vector<cv::Vec3b> object_color;

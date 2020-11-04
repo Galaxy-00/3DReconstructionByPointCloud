@@ -15,6 +15,7 @@ Reconstruction::Reconstruction(Mat &camMatrix, Mat &distCoeffs, int *x, int *y, 
 
 void Reconstruction::drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t)
 {
+    std::vector<cv::Point2f> reproj_point; // 重投影二维点
     // 利用t_R和t_t 重投影, 画出三维坐标轴
     std::vector<cv::Point3f> ori_pnt;
     ori_pnt.push_back(cv::Point3f(0, 0, 0)); // 坐标原点
@@ -42,6 +43,7 @@ void Reconstruction::drawAxis(Mat &frame, Mat &t_R, Mat &t_t)
 void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_t, vector<cv::Vec3f> &object_cloud, vector<cv::Vec3b> &object_color)
 {
     Mat frame_copy = frame.clone();
+    std::vector<cv::Point2f> reproj_point; // 重投影二维点
 
     // 函数cvProjectPoints2通过给定的内参数和外参数计算三维点投影到二维图像平面上的坐标
     // 将cloud范围内的点重投影到二维平面上, 并通过阈值分割后的图像来提取含有目标的点
@@ -54,9 +56,13 @@ void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_
         {
             continue;
         }
-        if (frame_out.at<uchar>(t_y, t_x) == 255)
+        if (frame_out.at<uchar>(t_y, t_x) == 255) // 筛选出无效的点
         {
             cloud_point_valid[j] = false;
+        }
+        else if (frame_out.at<uchar>(t_y, t_x) == 0) // 重置为有效
+        {
+            cloud_point_valid[j] = true;
         }
     }
 
@@ -86,14 +92,12 @@ void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_
             }
             if (t_dist < camera_dists.at<cv::Vec2d>(t_pnt)[0]) // 小于当前camera_dists中的值
             {
-                // cout<<t_pnt<<endl;
                 camera_dists.at<cv::Vec2d>(t_pnt)[0] = t_dist;
                 camera_dists.at<cv::Vec2d>(t_pnt)[1] = i;
             }
         }
     }
 
-    // cout<<1<<endl;
     // 设置有效点的颜色, 进一步筛选
     for (int i = 0; i < object_cloud.size(); i++)
     {
@@ -108,7 +112,7 @@ void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_
             color[i] = object_color[i];
         }
     }
-    // cout<<2<<endl;
+
     if (object_cloud.size() == 0)
     {
         object_cloud.push_back(cloud[0]);
@@ -116,7 +120,7 @@ void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_
     }
 }
 
-//
+// 初始化点云
 void Reconstruction::CreatPointCloud(std::vector<cv::Vec3f> &cloud, std::vector<cv::Vec3b> &color, int *x, int *y, int *z)
 {
     for (int tx = x[0]; tx <= x[1]; tx++)
