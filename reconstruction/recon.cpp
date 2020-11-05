@@ -60,10 +60,10 @@ void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_
         {
             cloud_point_valid[j] = false;
         }
-        else if (frame_out.at<uchar>(t_y, t_x) == 0) // 重置为有效
-        {
-            cloud_point_valid[j] = true;
-        }
+        // else if (frame_out.at<uchar>(t_y, t_x) == 0) // 重置为有效
+        // {
+            // cloud_point_valid[j] = true;
+        // }
     }
 
     // viz part

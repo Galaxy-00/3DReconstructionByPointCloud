@@ -71,20 +71,20 @@ int main(int argc, char *argv[])
     while (cp.grab())
     {
         cp.retrieve(frame);
-        Mat frame_copy = frame.clone();
+        Mat frame_pnp = frame.clone();
 
         // Solve Pnp Part
-        bool t_pnp_valid = pnp_solver.solve(frame, t_R, t_t); // 得到相机当前位姿t_R, t_t
+        bool t_pnp_valid = pnp_solver.solve(frame_pnp, t_R, t_t); // 得到相机当前位姿t_R, t_t
         if (t_pnp_valid)
         {
-            recon.drawAxisByProject(frame, t_R, t_t); // 通过重投影的点画出世界坐标系下的三维坐标轴, x R, y G, z B
-            // recon.drawAxis(frame, t_R, t_t); // 根据相机当前t_R, t_t 画出世界坐标系下的三维坐标轴
+            recon.drawAxisByProject(frame_pnp, t_R, t_t); // 通过重投影的点画出世界坐标系下的三维坐标轴, x R, y G, z B
+            // recon.drawAxis(frame_pnp, t_R, t_t); // 根据相机当前t_R, t_t 画出世界坐标系下的三维坐标轴
         }
-        cv::imshow("image", frame);
+        cv::imshow("image", frame_pnp);
 
         // Segment Part
         cv::Mat t_binary, frame_out;
-        segmenters.imageProcess(frame_copy, t_binary, frame_out); // 得到frame_out, 用于分割出目标
+        segmenters.imageProcess(frame, t_binary, frame_out); // 得到frame_out, 用于分割出目标
         cv::imshow("binary", t_binary);
         cv::imshow("segment", frame_out);
 
