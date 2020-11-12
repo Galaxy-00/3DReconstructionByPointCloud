@@ -62,7 +62,7 @@ void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_
         }
         // else if (frame_out.at<uchar>(t_y, t_x) == 0) // 重置为有效
         // {
-            // cloud_point_valid[j] = true;
+        // cloud_point_valid[j] = true;
         // }
     }
 
@@ -136,4 +136,55 @@ void Reconstruction::CreatPointCloud(std::vector<cv::Vec3f> &cloud, std::vector<
             }
         }
     }
+}
+
+// 通过pcl保存点云, 以便展示
+void Reconstruction::savePcl(string name)
+{
+    // 定义点云使用的格式：这里用的是XYZRGB
+    typedef pcl::PointXYZRGB PointT;
+    typedef pcl::PointCloud<PointT> PointCloud;
+
+    // 新建一个点云
+    PointCloud::Ptr pointCloud(new PointCloud);
+    for (int i = 0; i < cloud.size(); i++)
+    {
+        if (cloud_point_valid.at(i))
+        {
+            PointT p;
+            p.x = cloud.at(i)[0];
+            p.y = cloud.at(i)[1];
+            p.z = cloud.at(i)[2];
+            p.r = color.at(i)[2];
+            p.g = color.at(i)[1];
+            p.b = color.at(i)[0];
+            pointCloud->points.push_back(p);
+        }
+    }
+
+    // depth filter and statistical removal
+    PointCloud::Ptr tmp(new PointCloud);
+    pcl::StatisticalOutlierRemoval<PointT> statistical_filter;
+    statistical_filter.setMeanK(50);
+    statistical_filter.setStddevMulThresh(1.0);
+    statistical_filter.setInputCloud(pointCloud);
+    statistical_filter.filter(*tmp);
+    *pointCloud = *tmp;
+
+    pointCloud->is_dense = false;
+    cout << "点云共有" << pointCloud->size() << "个点." << endl;
+
+    // voxel filter
+    pcl::VoxelGrid<PointT> voxel_filter;
+    double resolution = 0.03;
+    voxel_filter.setLeafSize(resolution, resolution, resolution); // resolution
+    PointCloud::Ptr tmp(new PointCloud);
+    voxel_filter.setInputCloud(pointCloud);
+    voxel_filter.filter(*tmp);
+    tmp->swap(*pointCloud);
+
+    cout << "滤波之后，点云共有" << pointCloud->size() << "个点." << endl;
+
+    pcl::io::savePCDFileBinary(name + ".pcd", *pointCloud);
+
 }

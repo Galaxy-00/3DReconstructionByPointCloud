@@ -3,6 +3,13 @@
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/aruco/charuco.hpp>
+#include <Eigen/Geometry>
+#include <boost/format.hpp>  // for formating strings
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 
 using namespace std;
 using namespace cv;
@@ -15,6 +22,7 @@ public:
     void drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t);
     void setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_t, vector<cv::Vec3f> &objectPoints, vector<Vec3b> &objectColor);
     void drawAxis(Mat &frame, Mat &t_R, Mat &t_t);
+    void savePcl(string name);
 
 public:
     Mat camMatrix; // 相机内参

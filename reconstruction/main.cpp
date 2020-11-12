@@ -89,11 +89,11 @@ int main(int argc, char *argv[])
         cv::imshow("segment", frame_out);
 
         char key = cv::waitKey(1);
-        if (key == 'q')
+        if (key == 'q') // 退出
         {
             break;
         }
-        else if (key == 'c' && t_pnp_valid)
+        else if (key == 'c' && t_pnp_valid) // 捕捉当前帧
         {
             std::vector<cv::Vec3f> object_cloud;
             std::vector<cv::Vec3b> object_color;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
                 cloud_widget = new viz::WCloud(object_cloud, object_color);
             }
         }
-        else if (key == 's')
+        else if (key == 's') // 保存当前截图
         {
             window.saveScreenshot((fmt % count++).str());
         }
@@ -120,4 +120,9 @@ int main(int argc, char *argv[])
         }
         window.spinOnce(10, false);
     }
+
+    // 通过pcl保存点云
+    recon.savePcl("org");
+
+    return 0;
 }
