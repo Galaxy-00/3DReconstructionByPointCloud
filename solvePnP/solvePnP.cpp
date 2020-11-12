@@ -12,32 +12,32 @@ SolvePnP_::SolvePnP_(int w, int h, int d, float sl, float ml, string cameraParam
         return;
     }
 
-    detectorParamters = aruco::DetectorParameters::create();
+    detectorParamters = cv::aruco::DetectorParameters::create();
     if (!readDetectorParameters(detectorParamsFile, detectorParamters))
     {
         cerr << "Invalid detector parameters file" << endl;
         return;
     }
 
-    dictionary = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME(d));
+    dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(d));
     // create charuco board object
-    charucoboard = aruco::CharucoBoard::create(w, h, sl, ml, dictionary);
-    board = charucoboard.staticCast<aruco::Board>();
+    charucoboard = cv::aruco::CharucoBoard::create(w, h, sl, ml, dictionary);
+    board = charucoboard.staticCast<cv::aruco::Board>();
 }
 
-bool SolvePnP_::solve(Mat &image, Mat &rvec, Mat &tvec)
+bool SolvePnP_::solve(cv::Mat &image, cv::Mat &rvec, cv::Mat &tvec)
 {
-    vector<Point2f> charucoCorners;
+    vector<cv::Point2f> charucoCorners;
     vector<int> charucoIds;
-    vector<Point3f> objectPoints;
-    vector<Point2f> imagePoints;
+    vector<cv::Point3f> objectPoints;
+    vector<cv::Point2f> imagePoints;
 
     if (detectorCharuco(image, charucoCorners, charucoIds))
     {
         if (charucoCorners.size() > 4) // 至少需要３个点, 此处设置需要５个点
         {
             getObjectAndImagePoints(charucoIds, charucoCorners, objectPoints, imagePoints);
-            solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec, false, SOLVEPNP_ITERATIVE);
+            solvePnP(objectPoints, imagePoints, camMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_ITERATIVE);
             return true;
         }
     }
@@ -45,22 +45,22 @@ bool SolvePnP_::solve(Mat &image, Mat &rvec, Mat &tvec)
 }
 
 // 识别charuco获取角点及其id
-bool SolvePnP_::detectorCharuco(Mat &inImage, vector<Point2f> &charucoCorners, vector<int> &charucoIds)
+bool SolvePnP_::detectorCharuco(cv::Mat &inImage, vector<cv::Point2f> &charucoCorners, vector<int> &charucoIds)
 {
     vector<int> markerIds;
-    vector<vector<Point2f>> markerCorners, rejectedMarkers;
+    vector<vector<cv::Point2f>> markerCorners, rejectedMarkers;
 
     // 识别角点获取像素位置以及对应id
-    aruco::detectMarkers(inImage, dictionary, markerCorners, markerIds, detectorParamters, rejectedMarkers);
+    cv::aruco::detectMarkers(inImage, dictionary, markerCorners, markerIds, detectorParamters, rejectedMarkers);
     // 再识别
-    aruco::refineDetectedMarkers(inImage, board, markerCorners, markerIds, rejectedMarkers,
+    cv::aruco::refineDetectedMarkers(inImage, board, markerCorners, markerIds, rejectedMarkers,
                                  camMatrix, distCoeffs);
     int interpolatedCorners = 0;
     if (markerIds.size() > 0)
     {
         // 通过插值获取相机内参和畸变
         interpolatedCorners =
-            aruco::interpolateCornersCharuco(markerCorners, markerIds, inImage, charucoboard,
+            cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, inImage, charucoboard,
                                              charucoCorners, charucoIds, camMatrix, distCoeffs);
         return true;
     }
@@ -68,7 +68,7 @@ bool SolvePnP_::detectorCharuco(Mat &inImage, vector<Point2f> &charucoCorners, v
 }
 
 // 以charucoBoard id=0处建立世界坐标系, 给出对应id点在世界坐标系下的三维坐标objectPoints, 以及在图像上的对应的二维坐标imagePoints
-void SolvePnP_::getObjectAndImagePoints(vector<int> &charucoIds, vector<Point2f> &charucoCorners, vector<Point3f> &objectPoints, vector<Point2f> &imagePoints)
+void SolvePnP_::getObjectAndImagePoints(vector<int> &charucoIds, vector<cv::Point2f> &charucoCorners, vector<cv::Point3f> &objectPoints, vector<cv::Point2f> &imagePoints)
 {
     for (int i = 0; i < charucoIds.size(); i++)
     {
@@ -88,9 +88,9 @@ void SolvePnP_::getObjectAndImagePoints(vector<int> &charucoIds, vector<Point2f>
     }
 }
 
-bool SolvePnP_::readDetectorParameters(string filename, Ptr<aruco::DetectorParameters> &params)
+bool SolvePnP_::readDetectorParameters(string filename, cv::Ptr<cv::aruco::DetectorParameters> &params)
 {
-    FileStorage fs(filename, FileStorage::READ);
+    cv::FileStorage fs(filename, cv::FileStorage::READ);
     if (!fs.isOpened())
         return false;
 
@@ -117,9 +117,9 @@ bool SolvePnP_::readDetectorParameters(string filename, Ptr<aruco::DetectorParam
     return true;
 }
 
-bool SolvePnP_::readCameraParams(String file, Mat &cameraMatrix, Mat &distCoeffs)
+bool SolvePnP_::readCameraParams(string file, cv::Mat &cameraMatrix, cv::Mat &distCoeffs)
 {
-    FileStorage fs(file, FileStorage::READ);
+    cv::FileStorage fs(file, cv::FileStorage::READ);
     if (!fs.isOpened())
         return false;
     fs["camera_matrix"] >> cameraMatrix;

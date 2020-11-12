@@ -6,7 +6,7 @@ const char *keys =
 int main(int argc, char *argv[])
 {
     // 解析命令行参数
-    CommandLineParser parser(argc, argv, keys);
+    cv::CommandLineParser parser(argc, argv, keys);
     int cam_id = parser.get<int>("ci");
     cv::VideoCapture cp(cam_id);
 

@@ -4,9 +4,9 @@ Segmentation::Segmentation(int thresh_min, int thresh_max, int cur_channel, int 
 {
 }
 
-bool Segmentation::imageProcess(Mat &inImg, Mat &binaryImg, Mat &resImg)
+bool Segmentation::imageProcess(cv::Mat &inImg, cv::Mat &binaryImg, cv::Mat &resImg)
 {
-    Mat channel = getChannel(inImg, cur_channel);
+    cv::Mat channel = getChannel(inImg, cur_channel);
     if (cw)
     {
         binaryImg = channel > thresh_min & channel < thresh_max;
@@ -56,12 +56,12 @@ bool Segmentation::imageProcess(Mat &inImg, Mat &binaryImg, Mat &resImg)
     return false;
 }
 
-Mat Segmentation::getChannel(Mat &inImg, int cur_channel)
+cv::Mat Segmentation::getChannel(cv::Mat &inImg, int cur_channel)
 {
     assert(0 <= cur_channel && cur_channel <= 5);
 
-    Mat tmp;
-    Mat tmp_channel[3];
+    cv::Mat tmp;
+    cv::Mat tmp_channel[3];
     switch (cur_channel)
     {
     case H:

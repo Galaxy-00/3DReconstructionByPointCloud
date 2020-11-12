@@ -34,6 +34,8 @@ ubuntu 18.04
 
 vtk (6.0及以上)
 
+pcl (1.8及以上)
+
 opencv (3.0及以上)
 
 opencv-contrib (opencv同版本)

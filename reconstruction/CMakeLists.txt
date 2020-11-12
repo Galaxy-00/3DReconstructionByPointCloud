@@ -19,7 +19,8 @@ INSTALL(TARGETS recon_shared recon_static
 INSTALL(FILES ${recon_head} DESTINATION include)
 
 add_executable(recon main.cpp)
-target_link_libraries(recon recon_shared)
-target_link_libraries(recon solve_pnp_shared)
 target_link_libraries(recon segment_shared)
+target_link_libraries(recon solve_pnp_shared)
+target_link_libraries(recon recon_shared)
 target_link_libraries(recon ${OpenCV_LIBS})
+target_link_libraries(recon ${PCL_LIBRARIES})

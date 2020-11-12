@@ -20,6 +20,8 @@ namespace
         "{dp       |       | File of marker detector parameters }";
 } // namespace
 
+using namespace cv;
+
 int main(int argc, char *argv[])
 {
     CommandLineParser parser(argc, argv, keys);

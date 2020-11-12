@@ -1,6 +1,6 @@
 #include "recon.h"
 
-Reconstruction::Reconstruction(Mat &camMatrix, Mat &distCoeffs, int *x, int *y, int *z)
+Reconstruction::Reconstruction(cv::Mat &camMatrix, cv::Mat &distCoeffs, int *x, int *y, int *z)
 {
     this->camMatrix = camMatrix;
     this->distCoeffs = distCoeffs;
@@ -13,7 +13,7 @@ Reconstruction::Reconstruction(Mat &camMatrix, Mat &distCoeffs, int *x, int *y, 
     }
 }
 
-void Reconstruction::drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t)
+void Reconstruction::drawAxisByProject(cv::Mat &frame, cv::Mat &t_R, cv::Mat &t_t)
 {
     std::vector<cv::Point2f> reproj_point; // 重投影二维点
     // 利用t_R和t_t 重投影, 画出三维坐标轴
@@ -34,15 +34,15 @@ void Reconstruction::drawAxisByProject(Mat &frame, Mat &t_R, Mat &t_t)
     cv::line(frame, reproj_point[0], reproj_point[3], cv::Scalar(255, 0, 0), 3); // z轴, 蓝色
 }
 
-void Reconstruction::drawAxis(Mat &frame, Mat &t_R, Mat &t_t)
+void Reconstruction::drawAxis(cv::Mat &frame, cv::Mat &t_R, cv::Mat &t_t)
 {
     float axisLength = 3 * 0.34;
-    aruco::drawAxis(frame, camMatrix, distCoeffs, t_R, t_t, axisLength);
+    cv::aruco::drawAxis(frame, camMatrix, distCoeffs, t_R, t_t, axisLength);
 }
 
-void Reconstruction::setPointCloud(Mat &frame, Mat &frame_out, Mat &t_R, Mat &t_t, vector<cv::Vec3f> &object_cloud, vector<cv::Vec3b> &object_color)
+void Reconstruction::setPointCloud(cv::Mat &frame, cv::Mat &frame_out, cv::Mat &t_R, cv::Mat &t_t, vector<cv::Vec3f> &object_cloud, vector<cv::Vec3b> &object_color)
 {
-    Mat frame_copy = frame.clone();
+    cv::Mat frame_copy = frame.clone();
     std::vector<cv::Point2f> reproj_point; // 重投影二维点
 
     // 函数cvProjectPoints2通过给定的内参数和外参数计算三维点投影到二维图像平面上的坐标
@@ -163,13 +163,11 @@ void Reconstruction::savePcl(string name)
     }
 
     // depth filter and statistical removal
-    PointCloud::Ptr tmp(new PointCloud);
     pcl::StatisticalOutlierRemoval<PointT> statistical_filter;
     statistical_filter.setMeanK(50);
     statistical_filter.setStddevMulThresh(1.0);
     statistical_filter.setInputCloud(pointCloud);
-    statistical_filter.filter(*tmp);
-    *pointCloud = *tmp;
+    statistical_filter.filter(*pointCloud);
 
     pointCloud->is_dense = false;
     cout << "点云共有" << pointCloud->size() << "个点." << endl;
@@ -180,11 +178,9 @@ void Reconstruction::savePcl(string name)
     voxel_filter.setLeafSize(resolution, resolution, resolution); // resolution
     PointCloud::Ptr tmp(new PointCloud);
     voxel_filter.setInputCloud(pointCloud);
-    voxel_filter.filter(*tmp);
-    tmp->swap(*pointCloud);
+    voxel_filter.filter(*pointCloud);
 
     cout << "滤波之后，点云共有" << pointCloud->size() << "个点." << endl;
 
     pcl::io::savePCDFileBinary(name + ".pcd", *pointCloud);
-
 }

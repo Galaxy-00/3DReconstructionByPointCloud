@@ -6,7 +6,6 @@
 #include <opencv2/opencv.hpp>
 
 using namespace std;
-using namespace cv;
 
 class Segmentation
 {
@@ -25,7 +24,7 @@ public:
     // 构造函数
     Segmentation(int thresh_min, int thresh_max, int cur_channel, int cw);
     // 处理图像
-    bool imageProcess(Mat &inImg, Mat &binaryImg, Mat &resImg);
+    bool imageProcess(cv::Mat &inImg, cv::Mat &binaryImg, cv::Mat &resImg);
 
 public:
     int thresh_min; // 最小阈值
@@ -35,7 +34,7 @@ public:
 
 private:
     // 获取所用通道的图像
-    static Mat getChannel(Mat &inImg, int cur_channel); 
+    static cv::Mat getChannel(cv::Mat &inImg, int cur_channel); 
 };
 
 #endif // SEGMRNTATION_H
