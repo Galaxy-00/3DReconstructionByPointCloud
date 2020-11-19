@@ -76,5 +76,7 @@ cv::Mat Segmentation::getChannel(cv::Mat &inImg, int cur_channel)
         cvtColor(inImg, tmp, CV_BGR2Lab);
         split(tmp, tmp_channel);
         return tmp_channel[cur_channel - 3];
+    default:
+        break;
     }
 }

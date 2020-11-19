@@ -163,24 +163,23 @@ void Reconstruction::savePcl(string name)
     }
 
     // depth filter and statistical removal
-    pcl::StatisticalOutlierRemoval<PointT> statistical_filter;
-    statistical_filter.setMeanK(50);
-    statistical_filter.setStddevMulThresh(1.0);
-    statistical_filter.setInputCloud(pointCloud);
-    statistical_filter.filter(*pointCloud);
+    // pcl::StatisticalOutlierRemoval<PointT> statistical_filter;
+    // statistical_filter.setMeanK(50);
+    // statistical_filter.setStddevMulThresh(1.0);
+    // statistical_filter.setInputCloud(pointCloud);
+    // statistical_filter.filter(*pointCloud);
+    // pointCloud->is_dense = false;
 
-    pointCloud->is_dense = false;
     cout << "点云共有" << pointCloud->size() << "个点." << endl;
 
     // voxel filter
-    pcl::VoxelGrid<PointT> voxel_filter;
-    double resolution = 0.03;
-    voxel_filter.setLeafSize(resolution, resolution, resolution); // resolution
-    PointCloud::Ptr tmp(new PointCloud);
-    voxel_filter.setInputCloud(pointCloud);
-    voxel_filter.filter(*pointCloud);
+    // pcl::VoxelGrid<PointT> voxel_filter;
+    // double resolution = 0.03;
+    // voxel_filter.setLeafSize(resolution, resolution, resolution); // resolution
+    // PointCloud::Ptr tmp(new PointCloud);
+    // voxel_filter.setInputCloud(pointCloud);
+    // voxel_filter.filter(*pointCloud);
+    // cout << "滤波之后，点云共有" << pointCloud->size() << "个点." << endl;
 
-    cout << "滤波之后，点云共有" << pointCloud->size() << "个点." << endl;
-
-    pcl::io::savePCDFileBinary(name + ".pcd", *pointCloud);
+    pcl::io::savePCDFileBinary(name, *pointCloud);
 }

@@ -1,5 +1,5 @@
 #ifndef SOLVEPNP_H
-#define SLOVEPNP_H
+#define SOLVEPNP_H
 
 #include <opencv2/aruco/charuco.hpp>
 #include <opencv2/opencv.hpp>

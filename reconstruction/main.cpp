@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // 目标物体在距离世界坐标原点的范围
     int x[] = {-200, 0};
     int y[] = {0, 200};
-    int z[] = {0, 100};
+    int z[] = {0, 200};
     Reconstruction recon(pnp_solver.camMatrix, pnp_solver.distCoeffs, x, y, z);
 
     // 调参窗口
@@ -66,8 +66,10 @@ int main(int argc, char *argv[])
     window.showWidget("World", world_coor);
     window.showWidget("plane", plane);
 
-    int count = 0;
-    boost::format fmt("img%d.png");
+    int imgcnt = 0;
+    int pclcnt = 0;
+    boost::format imgfmt("img%d.png");
+    boost::format pclfmt("pcl%d.pcd");
     Mat t_R, t_t, frame;
     cv::VideoCapture cp(camId);
     while (cp.grab())
@@ -113,7 +115,11 @@ int main(int argc, char *argv[])
         }
         else if (key == 's') // 保存当前截图
         {
-            window.saveScreenshot((fmt % count++).str());
+            window.saveScreenshot((imgfmt % imgcnt++).str());
+        }
+        else if (key == 'p') // 通过pcl保存点云, 可以通过pcl_viewer打开
+        {
+            recon.savePcl((pclfmt % pclcnt++).str());
         }
 
         if (cloud_widget != nullptr)
@@ -122,9 +128,6 @@ int main(int argc, char *argv[])
         }
         window.spinOnce(10, false);
     }
-
-    // 通过pcl保存点云
-    recon.savePcl("org");
 
     return 0;
 }
