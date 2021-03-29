@@ -80,5 +80,5 @@ cd build/bin
 ---
 ## 结果演示
 三维重建橘子
-![orange](build/bin/img0.png)
-![orange](build/bin/img1.png)
+![orange](image/img0.png)
+![orange](image/img1.png)
